@@ -2,6 +2,11 @@
 
 {% block title %}Catalogue{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/products.css') }}">
+{% endblock %}
+
 {% block body %}
 <h1>Catalogue</h1>
 
