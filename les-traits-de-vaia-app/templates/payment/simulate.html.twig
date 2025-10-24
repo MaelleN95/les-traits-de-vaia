@@ -1,6 +1,19 @@
-<h1>Paiement simulé</h1>
-<p>Commande #{{ order.id }} — Total: {{ (order.total / 100)|number_format(2, ',', ' ') }} €</p>
+{% extends 'base.html.twig' %}
 
-<form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}">
-    <button type="submit">Payer (simulé)</button>
-</form>
+{% block title %}Paiement simulé{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/payment.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="payment-container">
+    <h1>Paiement simulé</h1>
+    <p>Commande #{{ order.id }} — Total : {{ (order.total / 100)|number_format(2, ',', ' ') }} €</p>
+
+    <form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}">
+        <button type="submit">Payer (simulé)</button>
+    </form>
+</div>
+{% endblock %}

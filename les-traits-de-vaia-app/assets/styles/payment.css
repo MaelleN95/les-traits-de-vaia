@@ -1,0 +1,58 @@
+    /* ---------- Conteneur principal ---------- */
+.payment-container {
+    max-width: 500px;
+    margin: 3rem auto;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+/* ---------- Titre ---------- */
+.payment-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #222;
+}
+
+/* ---------- Détails de commande ---------- */
+.payment-container p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+/* ---------- Bouton de paiement ---------- */
+.payment-container button {
+    background-color: #198754; /* vert “succès” */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.payment-container button:hover {
+    background-color: #157347;
+}
+
+.payment-container button:active {
+    transform: scale(0.98);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+    body {
+        padding: 1rem;
+    }
+    .payment-container {
+        padding: 1.5rem;
+    }
+    .payment-container h1 {
+        font-size: 1.5rem;
+    }
+}
