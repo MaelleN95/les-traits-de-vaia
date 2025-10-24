@@ -1,0 +1,6 @@
+<h1>Paiement simulé</h1>
+<p>Commande #{{ order.id }} — Total: {{ (order.total / 100)|number_format(2, ',', ' ') }} €</p>
+
+<form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}">
+    <button type="submit">Payer (simulé)</button>
+</form>

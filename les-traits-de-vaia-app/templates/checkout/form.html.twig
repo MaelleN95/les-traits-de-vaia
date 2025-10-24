@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block body %}
+<h1>Checkout</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.fullname) }}
+    {{ form_row(form.address) }}
+    {{ form_row(form.city) }}
+    {{ form_row(form.postcode) }}
+{{ form_end(form) }}
+{% endblock %}

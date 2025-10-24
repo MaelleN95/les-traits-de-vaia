@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue{% endblock %}
+
+{% block body %}
+<h1>Catalogue</h1>
+
+<div class="product-grid">
+    {% for product in products %}
+        {% include 'shop/_product_card.html.twig' with {product: product} %}
+    {% else %}
+        <p>Aucun produit.</p>
+    {% endfor %}
+</div>
+
+{% include 'shop/_pagination.html.twig' with { page: page, limit: limit, total: total, path: path('shop_index') } %}
+{% endblock %}

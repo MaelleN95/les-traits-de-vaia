@@ -41,6 +41,9 @@ class Order
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'customerOrder')]
     private Collection $items;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $paidAt = null;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -149,6 +152,18 @@ class Order
                 $item->setCustomerOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPaidAt(): ?\DateTimeImmutable
+    {
+        return $this->paidAt;
+    }
+
+    public function setPaidAt(?\DateTimeImmutable $paidAt): static
+    {
+        $this->paidAt = $paidAt;
 
         return $this;
     }
