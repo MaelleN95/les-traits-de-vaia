@@ -51,7 +51,7 @@
                     </li>
                 {% endif %}
                 <li class="nav-item cart-link">
-                    <a href="{{ path('cart_index') }}" class="cart-icon">
+                    <a href="{{ path('cart_index') }}" class="cart-icon nav-link">
                         Panier
                         {% if app.session.get('cart') is not empty %}
                             <div>
