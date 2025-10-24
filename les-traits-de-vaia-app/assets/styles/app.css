@@ -19,3 +19,94 @@ main {
     margin-top: 2rem;
 
 }
+
+/* ---------- Flash messages ---------- */
+.flash-message {
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Succès */
+.flash-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+/* Erreur */
+.flash-error {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+/* Animation d’apparition */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+    .main-container {
+        padding: 1.5rem 1rem;
+    }
+    .flash-message {
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* ---------- Panier dans le header ---------- */
+.cart-link {
+    position: relative;
+    list-style: none;
+    margin: 0 2rem;
+}
+
+.cart-icon {
+    text-decoration: none;
+    color: #333;
+    position: relative;
+}
+
+.cart-icon:hover {
+    color: #007bff;
+}
+
+.cart-icon div {
+    position: absolute;
+    top: -8px;
+    right: -22px;
+
+    height: 22px;
+    width: 22px;
+}
+
+/* Badge du nombre d’articles */
+.cart-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: rgba(98, 68, 28, 1);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
+}
+

@@ -50,27 +50,45 @@
                         <a class="nav-link" href="{{ path('app_register') }}">Inscription</a>
                     </li>
                 {% endif %}
+                <li class="nav-item cart-link">
+                    <a href="{{ path('cart_index') }}" class="cart-icon">
+                        Panier
+                        {% if app.session.get('cart') is not empty %}
+                            <div>
+                                <span class="cart-count">
+                                    {{
+                                        app.session.get('cart')|reduce((carry, item) => carry + item, 0)
+                                    }}
+                                </span>
+                            </div>
+                        {% else %}
+                            <div>
+                                <span class="cart-count">0</span>
+                             </div>
+                        {% endif %}
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
 
     {# ---------- CONTENU PRINCIPAL ---------- #}
-    <main class="container py-4">
+    <main class="main-container">
         {% for message in app.flashes('success') %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="flash-message flash-success">
                 {{ message }}
-                
             </div>
         {% endfor %}
 
         {% for message in app.flashes('error') %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="flash-message flash-error">
                 {{ message }}
             </div>
         {% endfor %}
 
         {% block body %}{% endblock %}
     </main>
+
 
     {# ---------- FOOTER ---------- #}
     <footer class="bg-light text-center text-muted py-4 border-top mt-5">
