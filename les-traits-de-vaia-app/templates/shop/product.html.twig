@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ product.name }} — Boutique{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
 {% block body %}
 <article class="product-detail">
     <img src="{{ product.image }}" alt="{{ product.name }}">

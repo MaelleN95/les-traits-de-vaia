@@ -2,63 +2,57 @@
 
 {% block title %}{{ category.name }} - Boutique{% endblock %}
 
-{% block body %}
-<div class="container mt-4">
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/products.css') }}">
+{% endblock %}
 
-    <h1 class="mb-4">{{ category.name }}</h1>
+{% block body %}
+    <h1>{{ category.name }}</h1>
 
     {% if products is empty %}
         <p>Aucun produit dans cette catégorie.</p>
     {% else %}
-        <div class="row g-4">
+        <div class="product-grid">
             {% for product in products %}
-                <div class="col-md-3">
-                    <div class="card h-100 shadow-sm">
+                <article class="product-card">
+                    <a href="{{ path('shop_product', {slug: product.slug}) }}" class="product-title">
                         {% if product.image %}
                             <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
                         {% endif %}
+                        <h3>{{ product.name }}</h3>
+                    </a>
 
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ path('shop_product', {slug: product.slug}) }}">
-                                    {{ product.name }}
-                                </a>
-                            </h5>
-                            <p class="card-text text-muted">{{ product.price / 100 }} €</p>
-                        </div>
+                    <p class="price">{{ (product.price / 100) | number_format(2, ',', ' ') }} €</p>
 
-                        <div class="card-footer bg-transparent border-top-0">
-                            <a href="{{ path('cart_add', {id: product.id}) }}" class="btn btn-sm btn-primary w-100">
-                                Ajouter au panier
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                    <p>
+                        <a class="btn" href="{{ path('cart_add', {id: product.id}) }}">Ajouter au panier</a>
+                        <a class="btn-link" href="{{ path('shop_product', {slug: product.slug}) }}">Voir</a>
+                    </p>
+                </article>
             {% endfor %}
         </div>
 
         {% if total > limit %}
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {% set totalPages = (total / limit)|round(0, 'ceil') %}
-
-                    {% for p in 1..totalPages %}
-                        <li class="page-item {% if p == page %}active{% endif %}">
-                            <a class="page-link"
-                               href="{{ path('shop_category', {slug: category.slug, page: p}) }}">
-                                {{ p }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </nav>
+            {% include 'shop/_pagination.html.twig' with {
+                page: page,
+                limit: limit,
+                total: total,
+                path: path('shop_category', {slug: category.slug})
+            } %}
         {% endif %}
     {% endif %}
 
-    <div class="mt-4">
-        <button onclick="history.back()" class="btn btn-secondary">
-            ← Revenir en arrière
-        </button>
+    <div class="spacer-large">
+        <div class="btn-secondary">
+            <button onclick="history.back()" class="btn btn-secondary">
+                ← Revenir en arrière
+            </button>
+        </div>
+        <div class="btn-secondary">
+            <a href="{{ path('shop_index') }}" class="btn btn-secondary">
+                Revenir à l'accueil
+            </a>
+        </div>
     </div>
-</div>
 {% endblock %}
