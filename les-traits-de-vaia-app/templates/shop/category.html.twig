@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ category.name }} - Boutique{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <h1 class="mb-4">{{ category.name }}</h1>
+
+    {% if products is empty %}
+        <p>Aucun produit dans cette catégorie.</p>
+    {% else %}
+        <div class="row g-4">
+            {% for product in products %}
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        {% if product.image %}
+                            <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ path('shop_product', {slug: product.slug}) }}">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted">{{ product.price / 100 }} €</p>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{{ path('cart_add', {id: product.id}) }}" class="btn btn-sm btn-primary w-100">
+                                Ajouter au panier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if total > limit %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% set totalPages = (total / limit)|round(0, 'ceil') %}
+
+                    {% for p in 1..totalPages %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link"
+                               href="{{ path('shop_category', {slug: category.slug, page: p}) }}">
+                                {{ p }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% endif %}
+
+    <div class="mt-4">
+        <button onclick="history.back()" class="btn btn-secondary">
+            ← Revenir en arrière
+        </button>
+    </div>
+</div>
+{% endblock %}

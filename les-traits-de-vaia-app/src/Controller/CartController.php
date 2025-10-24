@@ -1,27 +1,81 @@
 <?php
 namespace App\Controller;
 
-use App\Repository\ProductRepository;
 use App\Service\CartService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Repository\ProductRepository;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/cart', name: 'cart_')]
 class CartController extends AbstractController
 {
-    #[Route('/cart/add/{id}', name: 'cart_add')]
-    public function add(int $id, CartService $cartService, ProductRepository $productRepo): RedirectResponse
+
+    private CartService $cartService;
+
+    public function __construct(CartService $cartService)
     {
-        $product = $productRepo->find($id);
-        if (!$product) {
-            throw $this->createNotFoundException('Product not found.');
-        }
+        $this->cartService = $cartService;
+    }
 
-        $cartService->add($id);
+    #[Route('/', name: 'index')]
+    public function index(CartService $cartService): Response
+    {
+        $items = $cartService->getDetailedCartItems();
+        $total = $cartService->getTotal();
 
-        $this->addFlash('success', sprintf('Produit "%s" ajouté au panier.', $product->getName()));
+        return $this->render('cart/index.html.twig', [
+            'items' => $items,
+            'total' => $total,
+        ]);
+    }
 
-        // Redirige vers la page précédente ou vers le catalogue
-        return $this->redirectToRoute('shop_index');
+    /**
+     * Ajoute un produit au panier
+     */
+    #[Route('/add/{id}', name: 'add')]
+    public function add(int $id): Response
+    {
+        $this->cartService->add($id);
+
+        $this->addFlash('success', 'Produit ajouté au panier.');
+        return $this->redirectToRoute('cart_index');
+    }
+
+    /**
+     * Retire une unité d’un produit
+     */
+    #[Route('/remove-one/{id}', name: 'remove_one')]
+    public function removeOne(int $id): Response
+    {
+        $this->cartService->removeOne($id);
+
+        $this->addFlash('success', 'Quantité mise à jour.');
+        return $this->redirectToRoute('cart_index');
+    }
+
+    /**
+     * Retire complètement un produit
+     */
+    #[Route('/remove/{id}', name: 'remove')]
+    public function remove(int $id): Response
+    {
+        $this->cartService->remove($id);
+
+        $this->addFlash('success', 'Produit supprimé du panier.');
+        return $this->redirectToRoute('cart_index');
+    }
+
+    /**
+     * Vide le panier
+     */
+    #[Route('/clear', name: 'clear')]
+    public function clear(): Response
+    {
+        $this->cartService->clear();
+
+        $this->addFlash('success', 'Panier vidé.');
+        return $this->redirectToRoute('cart_index');
     }
 }

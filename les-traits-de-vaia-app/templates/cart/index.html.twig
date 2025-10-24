@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Mon panier</h1>
+
+    {% if items is empty %}
+        <div class="alert alert-info">
+            Votre panier est vide.
+        </div>
+        <a href="{{ path('shop_index') }}" class="btn btn-primary">Retourner à la boutique</a>
+    {% else %}
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Produit</th>
+                    <th scope="col">Prix unitaire</th>
+                    <th scope="col" style="width:120px;">Quantité</th>
+                    <th scope="col">Sous-total</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.product.image %}
+                                    <img src="{{ asset('uploads/' ~ item.product.image) }}" alt="{{ item.product.name }}" width="60" class="me-3 rounded">
+                                {% endif %}
+                                <a href="{{ path('shop_product', { slug: item.product.slug }) }}" class="text-decoration-none">
+                                    {{ item.product.name }}
+                                </a>
+                            </div>
+                        </td>
+                        <td>{{ (item.product.price / 100)|number_format(2, ',', ' ') }} €</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('cart_remove_one', {id: item.product.id}) }}" class="btn btn-sm btn-outline-secondary">-</a>
+                                <span class="btn btn-sm btn-light">{{ item.quantity }}</span>
+                                <a href="{{ path('cart_add', {id: item.product.id}) }}" class="btn btn-sm btn-outline-secondary">+</a>
+                            </div>
+                        </td>
+                        <td>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',', ' ') }} €</td>
+                        <td>
+                            <a href="{{ path('cart_remove', {id: item.product.id}) }}" class="btn btn-sm btn-danger">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold">Total :</td>
+                    <td colspan="2" class="fw-bold">{{ (total / 100)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('shop_index') }}" class="btn btn-outline-secondary">
+                ← Continuer mes achats
+            </a>
+            {% if app.user %}
+                <a href="{{ path('checkout') }}" class="btn btn-success">
+                    Procéder au paiement
+                </a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-primary">
+                    Se connecter pour payer
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
