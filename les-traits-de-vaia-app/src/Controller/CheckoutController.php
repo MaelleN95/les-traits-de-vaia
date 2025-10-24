@@ -54,8 +54,6 @@ class CheckoutController extends AbstractController
             $em->persist($order);
             $em->flush();
 
-            $cartService->clear();
-
             return $this->redirectToRoute('payment_simulate', ['orderId' => $order->getId()]);
         }
 
@@ -76,7 +74,7 @@ class CheckoutController extends AbstractController
     }
 
     #[Route('/payment/complete/{orderId}', name:'payment_complete', methods:['POST'])]
-    public function completePayment(int $orderId, EntityManagerInterface $em)
+    public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService)
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         if(!$order) throw $this->createNotFoundException('Order not found');
@@ -85,12 +83,13 @@ class CheckoutController extends AbstractController
         $order->setPaidAt(new \DateTimeImmutable());
         $em->flush();
 
+        // Vider le panier
+        $cartService->clear();
+
         // ici tu pourrais dispatcher un message Messenger pour envoyer un email
 
         $this->addFlash('success', 'Paiement effectué avec succès !');
 
         return $this->redirectToRoute('shop_index');
     }
-
-
 }
