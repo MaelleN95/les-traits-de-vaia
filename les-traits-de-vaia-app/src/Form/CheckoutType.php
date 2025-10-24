@@ -11,10 +11,26 @@ class CheckoutType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('fullname', TextType::class)
-            ->add('address', TextType::class)
-            ->add('city', TextType::class)
-            ->add('postcode', TextType::class)
+            ->add('fullname', TextType::class,
+                [
+                    'label' => 'Nom complet',
+                ]
+            )
+            ->add('address', TextType::class,
+                [
+                    'label' => 'Adresse',
+                ]
+            )
+            ->add('city', TextType::class,
+                [
+                    'label' => 'Ville',
+                ]
+            )
+            ->add('postcode', TextType::class,
+                [
+                    'label' => 'Code postal',
+                ]
+            )
             ->add('submit', SubmitType::class, ['label' => 'Valider'])
         ;
     }
