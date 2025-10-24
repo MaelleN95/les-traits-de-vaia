@@ -1,0 +1,51 @@
+services:
+  php:
+    container_name: les-traits-de-vaia-php
+    build:
+      context: ./docker/php
+    volumes:
+      - ./les-traits-de-vaia-app:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - mariadb
+
+  nginx:
+    container_name: les-traits-de-vaia-nginx
+    image: nginx:stable-alpine
+    ports:
+      - '8080:80'
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./les-traits-de-vaia-app:/var/www/html
+    depends_on:
+      - php
+
+  mariadb:
+    container_name: les-traits-de-vaia-db
+    image: mariadb:10.11
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mariadb/custom.cnf:/etc/mysql/conf.d/custom.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: les-traits-de-vaia
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+
+  phpmyadmin:
+    container_name: les-traits-de-vaia-phpmyadmin
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - '8081:80'
+    environment:
+      PMA_HOST: les-traits-de-vaia-db
+      PMA_PORT: 3306
+      PMA_USER: symfony
+      PMA_PASSWORD: symfony
+    depends_on:
+      - mariadb
+
+volumes:
+  db_data:
