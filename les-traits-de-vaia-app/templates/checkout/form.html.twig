@@ -2,8 +2,13 @@
 
 {% block title %}Checkout{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/forms.css') }}">  
+{% endblock %}
+
 {% block body %}
-<h1>Checkout</h1>
+<h1>Commander</h1>
 
 {{ form_start(form) }}
     {{ form_row(form.fullname) }}

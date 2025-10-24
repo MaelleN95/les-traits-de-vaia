@@ -1,0 +1,141 @@
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* ---------- Formulaire ---------- */
+form {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+}
+
+/* Label générique */
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Champs input, email, password, textarea */
+input, select, textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: rgba(160, 112, 48, 1);
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+    outline: none;
+}
+
+/* Checkbox générique */
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Label associé à la checkbox */
+input[type="checkbox"] + label,
+label.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: #495057;
+}
+
+.remember-me label {
+    cursor: pointer;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.remember-me input {
+    margin:0;
+    margin-right:0.5rem;
+}
+
+/* Espace entre checkbox et texte */
+input[type="checkbox"] + label span {
+    margin-left: 0.25rem;
+}
+
+/* Hover et focus sur checkbox */
+input[type="checkbox"]:hover,
+input[type="checkbox"]:focus {
+    outline: 1px solid rgba(160, 112, 48, 1);
+}
+
+
+/* Messages d’erreur Symfony */
+form .form-error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Boutons génériques */
+.submit-group {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+button, input[type="submit"] {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+button.btn-primary, input[type="submit"].btn-primary {
+    background-color: rgba(160, 112, 48, 1);
+  color: #fff;
+    color: #fff;
+}
+
+button.btn-primary:hover, input[type="submit"].btn-primary:hover {
+    background-color: rgba(98, 68, 28, 1);
+}
+
+/* Lien sous le formulaire */
+p {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+p a {
+    color: rgba(160, 112, 48, 1);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    form {
+        padding: 1.5rem;
+    }
+}

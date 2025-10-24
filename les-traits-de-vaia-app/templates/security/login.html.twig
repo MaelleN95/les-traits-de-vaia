@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Se connecter{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/forms.css') }}">  
+{% endblock %}
 
 {% block body %}
 <form method="post">
