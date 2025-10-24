@@ -1,0 +1,205 @@
+/* ---------- Container ---------- */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ---------- Titres ---------- */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* ---------- Alert ---------- */
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.alert-info {
+  background-color: #e7f3fe;
+  color: #055160;
+  border: 1px solid #b6e0fe;
+}
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: rgba(160, 112, 48, 1);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: rgba(98, 68, 28, 1);
+}
+
+.btn-success {
+  background-color: #198754;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background-color: #146c43;
+}
+
+.btn-outline-secondary {
+  background-color: #fff;
+  border: 1px solid rgba(98, 68, 28, 1);
+  color: rgba(160, 112, 48, 1);
+}
+
+.btn-outline-secondary:hover {
+  background-color: rgba(98, 68, 28, 1);
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #b02a37;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* ---------- Table ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+thead {
+  background-color: #f8f9fa;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+th {
+  font-weight: 600;
+  color: rgba(160, 112, 48, 1);
+}
+
+/* Image produit dans le panier */
+td img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Flex pour aligner image + nom */
+td .d-flex {
+  display: flex;
+  align-items: center;
+}
+
+/* Links dans table */
+td a {
+  text-decoration: none;
+  color: black;
+}
+
+td a:hover {
+  text-decoration: underline;
+}
+
+/* Footer du tableau (total) */
+tfoot td {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* Group boutons + / - */
+.btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-group span {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+/* ---------- Action boutons ---------- */
+.d-flex.justify-content-between {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  tr {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+  }
+
+  td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 1rem;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+  }
+}

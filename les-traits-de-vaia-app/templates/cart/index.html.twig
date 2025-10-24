@@ -2,6 +2,11 @@
 
 {% block title %}Mon panier{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/cart.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="container mt-4">
     <h1 class="mb-4">Mon panier</h1>
@@ -25,29 +30,29 @@
             <tbody>
                 {% for item in items %}
                     <tr>
-                        <td>
+                       <td data-label="Produit">
                             <div class="d-flex align-items-center">
                                 {% if item.product.image %}
-                                    <img src="{{ asset('uploads/' ~ item.product.image) }}" alt="{{ item.product.name }}" width="60" class="me-3 rounded">
+                                     <img src="{{ item.product.image }}" alt="{{ item.product.name }}" loading="lazy">
                                 {% endif %}
-                                <a href="{{ path('shop_product', { slug: item.product.slug }) }}" class="text-decoration-none">
-                                    {{ item.product.name }}
-                                </a>
+                                <a href="{{ path('shop_product', { slug: item.product.slug }) }}">{{ item.product.name }}</a>
                             </div>
                         </td>
-                        <td>{{ (item.product.price / 100)|number_format(2, ',', ' ') }} €</td>
-                        <td>
-                            <div class="btn-group" role="group">
+
+                        <td data-label="Prix unitaire">{{ (item.product.price / 100)|number_format(2, ',', ' ') }} €</td>
+
+                        <td data-label="Quantité">
+                            <div class="btn-group">
                                 <a href="{{ path('cart_remove_one', {id: item.product.id}) }}" class="btn btn-sm btn-outline-secondary">-</a>
-                                <span class="btn btn-sm btn-light">{{ item.quantity }}</span>
+                                <span>{{ item.quantity }}</span>
                                 <a href="{{ path('cart_add', {id: item.product.id}) }}" class="btn btn-sm btn-outline-secondary">+</a>
                             </div>
                         </td>
-                        <td>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',', ' ') }} €</td>
-                        <td>
-                            <a href="{{ path('cart_remove', {id: item.product.id}) }}" class="btn btn-sm btn-danger">
-                                Supprimer
-                            </a>
+
+                        <td data-label="Sous-total">{{ ((item.product.price * item.quantity)/100)|number_format(2, ',', ' ') }} €</td>
+
+                        <td data-label="Action">
+                            <a href="{{ path('cart_remove', {id: item.product.id}) }}" class="btn btn-sm btn-danger">Supprimer</a>
                         </td>
                     </tr>
                 {% endfor %}
