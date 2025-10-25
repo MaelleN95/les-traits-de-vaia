@@ -1,19 +1,206 @@
+{# templates/payment/simulate.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Paiement simulé{% endblock %}
+{% block title %}Paiement — Commande #{{ order.id }}{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('styles/payment.css') }}">
+  {{ parent() }}
+ 
+<style>
+/* assets/styles/payment.css */
+
+.payment-container {
+  max-width: 980px;
+  margin: 2.5rem auto;
+  padding: 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.payment-container h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #222;
+}
+
+.payment-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 6px 18px rgba(15, 15, 15, 0.06);
+}
+
+/* layout */
+.row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.col-left {
+  flex: 1.4;
+  min-width: 260px;
+}
+
+.col-right {
+  flex: 0.9;
+  min-width: 220px;
+}
+
+/* order items */
+.order-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  border-top: 1px solid #eee;
+}
+
+.order-items li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed #f0f0f0;
+  align-items: center;
+}
+
+.order-items .name {
+  flex: 1;
+  color: #333;
+  margin-right: 0.75rem;
+}
+
+.order-items .qty {
+  color: #666;
+  margin-right: 0.75rem;
+  min-width: 36px;
+  text-align: center;
+}
+
+.order-items .line {
+  color: #111;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* total */
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #ddd;
+  margin-top: 0.75rem;
+}
+
+.order-total strong {
+  font-size: 1.15rem;
+  color: #0d6efd;
+}
+
+/* buttons */
+.btn {
+  display: inline-block;
+  width: auto;
+  text-align: center;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.08s ease, background-color 0.12s ease;
+  text-decoration: none;
+  color: #fff;
+}
+
+.btn.full {
+  width: 100%;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #0d6efd;
+}
+
+.btn-primary:hover { background: #0b5ed7; transform: translateY(-2px); }
+
+.btn-success { background: #198754; }
+.btn-success:hover { background: #157347; transform: translateY(-2px); }
+
+.btn-danger { background: #dc3545; }
+.btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
+
+.btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+}
+
+.btn-outline:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* spacing helpers */
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .row { flex-direction: column; }
+  .col-right { order: 2; }
+  .col-left { order: 1; }
+}
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="payment-container">
-    <h1>Paiement simulé</h1>
-    <p>Commande #{{ order.id }} — Total : {{ (order.total / 100)|number_format(2, ',', ' ') }} €</p>
+    <h1>Paiement — Commande #{{ order.id }}</h1>
 
-    <form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}">
-        <button type="submit">Payer (simulé)</button>
-    </form>
+    <div class="payment-box">
+        <div class="row">
+            <div class="col-left">
+                <h2>Détails de la commande</h2>
+                <ul class="order-items">
+                    {% for item in order.items %}
+                        <li>
+                            <span class="name">{{ item.product.name }}</span>
+                            <span class="qty">×{{ item.quantity }}</span>
+                            <span class="line">{{ (item.unitPrice * item.quantity / 100)|number_format(2, ',', ' ') }} €</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="order-total">
+                    <span>Total</span>
+                    <strong>{{ (order.total / 100)|number_format(2, ',', ' ') }} €</strong>
+                </div>
+            </div>
+
+            <div class="col-right">
+                <h2>Méthode de paiement</h2>
+
+                {# Stripe : appelle route payment_start (POST) #}
+                <form method="post" action="{{ path('payment_start', {orderId: order.id}) }}">
+                    <button type="submit" class="btn btn-primary full">Payer par carte (Stripe)</button>
+                </form>
+
+                {# Simulation : appelle route payment_complete (POST) ou payment_simulate #}
+                <form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}" class="mt-2">
+                    <button type="submit" class="btn btn-success full">Payer (simulé — succès)</button>
+                </form>
+
+                <form method="post" action="{{ path('payment_failed', {orderId: order.id}) }}" class="mt-2">
+                    <button type="submit" class="btn btn-danger full">Simuler échec</button>
+                </form>
+
+                <a href="{{ path('cart_index') }}" class="btn btn-outline mt-3">Retour au panier</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
