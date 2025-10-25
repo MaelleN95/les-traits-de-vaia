@@ -5,12 +5,12 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class RegistrationFormType extends AbstractType
 {
@@ -19,19 +19,22 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('fullname', TextType::class, [
                 'label' => 'Prénom',
-                'constraints' => [new NotBlank()],
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'constraints' => [new NotBlank()],
             ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Mot de passe',
                 'mapped' => false,
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(['min' => 6, 'max' => 4096]),
-                ],
+        'constraints' => [
+            new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
+            new Length([
+                'min' => 6,
+                'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
+                'max' => 200,
+                'maxMessage' => 'Le mot de passe ne peut pas dépasser {{ limit }} caractères',
+            ]),
+        ],
             ]);
     }
 
