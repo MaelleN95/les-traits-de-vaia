@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -17,24 +18,40 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom du produit ne peut pas être vide.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le slug du produit ne peut pas être vide.')]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'La description du produit ne peut pas être vide.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'La description du produit doit contenir au moins {{ limit }} caractères.'
+    )]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix du produit ne peut pas être vide.')]
+    #[Assert\Positive(message: 'Le prix du produit doit être un nombre positif.')]
     private ?int $price = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le stock du produit ne peut pas être vide.')]
+    #[Assert\PositiveOrZero(message: 'Le stock du produit doit être un nombre positif ou nul.')]
     private ?int $stock = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotBlank(message: 'La date de création ne peut pas être vide.')]
+    #[Assert\Type(
+        type: \DateTimeImmutable::class,
+        message: 'La date de création doit être une date valide.'
+    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]

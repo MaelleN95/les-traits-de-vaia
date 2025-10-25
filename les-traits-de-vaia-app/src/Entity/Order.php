@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -18,18 +19,39 @@ class Order
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le statut ne peut pas être vide.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le statut ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $status = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le total ne peut pas être vide.')]
+    #[Assert\Positive(message: 'Le total doit être un nombre positif.')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'Le total doit être un nombre entier.'
+    )]
     private ?int $total = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La date de création ne peut pas être vide.')]
+    #[Assert\Type(
+        type: \DateTimeImmutable::class,
+        message: 'La date de création doit être une date valide.'
+    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type(
+        type: \DateTimeImmutable::class,
+        message: 'La date de mise à jour doit être une date valide.'
+    )]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: 'L\'adresse ne peut pas dépasser {{ limit }} caractères.'
+    )]
     private ?string $address = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
@@ -42,6 +64,10 @@ class Order
     private Collection $items;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type(
+        type: \DateTimeImmutable::class,
+        message: 'La date de paiement doit être une date valide.'
+    )]
     private ?\DateTimeImmutable $paidAt = null;
 
     public function __construct()

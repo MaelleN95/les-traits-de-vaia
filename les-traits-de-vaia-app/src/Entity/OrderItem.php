@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\OrderItemRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
 class OrderItem
@@ -14,9 +15,22 @@ class OrderItem
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'La quantité doit être un nombre entier.'
+    )]
+    #[Assert\PositiveOrZero(
+        message: 'La quantité doit être un nombre positif ou nul.'
+    )   ]
     private ?int $quantity = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix unitaire ne peut pas être vide.')]
+    #[Assert\Positive(message: 'Le prix unitaire doit être un nombre positif.')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'Le prix unitaire doit être un nombre entier.'
+    )]
     private ?int $unitPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
