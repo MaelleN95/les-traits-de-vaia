@@ -21,7 +21,13 @@ class CartService
     public function add(int $productId, int $qty = 1): void
     {
         $cart = $this->getCart();
-        $cart[$productId] = ($cart[$productId] ?? 0) + $qty;
+
+        if (isset($cart[$productId])) {
+            $cart[$productId] += $qty;
+        } else {
+            $cart[$productId] = $qty;
+        }
+        
         $this->session->set('cart', $cart);
     }
 

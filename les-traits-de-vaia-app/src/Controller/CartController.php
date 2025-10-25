@@ -38,8 +38,9 @@ class CartController extends AbstractController
     #[Route('/add/{id}', name: 'add')]
     public function add(int $id, Request $request): Response
     {
-        $this->cartService->add($id);
+        $qty = max(1, (int) $request->request->get('qty', 1));
 
+        $this->cartService->add($id, $qty);
         $this->addFlash('success', 'Produit ajouté au panier.');
 
         $referer = $request->headers->get('referer');
