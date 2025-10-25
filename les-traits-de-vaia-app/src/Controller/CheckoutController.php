@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -77,17 +78,17 @@ class CheckoutController extends AbstractController
     }
 
     #[Route('/payment/{orderId}', name: 'payment_start', methods: ['POST'])]
-    public function start(int $orderId, EntityManagerInterface $em): Response
+    public function start(int $orderId, EntityManagerInterface $em): JsonResponse
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         if (!$order) {
             throw $this->createNotFoundException('Order not found');
         }
-
-        // Vérifie correctement la clé
+ 
         if (!isset($_ENV['STRIPE_SECRET_KEY']) || empty($_ENV['STRIPE_SECRET_KEY'])) {
             throw new \LogicException('Stripe secret key is missing.');
         }
+
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
         $unitAmount = (int) $order->getTotal(); // en centimes
@@ -110,7 +111,8 @@ class CheckoutController extends AbstractController
             'cancel_url'  => $this->generateUrl('payment_failed', ['orderId' => $orderId], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
 
-        return $this->redirect($session->url, 303);
+        // On renvoie juste l’URL, pas de redirection serveur car il supprime ce qu'il se trouve après le dièze dans l'url => Amène à l'erreur "Something went wrong The page you were looking for could not be found. Please check the URL or contact the merchant."
+        return $this->json(['url' => $session->url]);
     }
 
     #[Route('/payment/complete/{orderId}', name:'payment_complete', methods:['POST'])]

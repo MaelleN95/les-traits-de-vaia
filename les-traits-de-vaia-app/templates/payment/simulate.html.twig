@@ -185,7 +185,7 @@
                 <h2>Méthode de paiement</h2>
 
                 {# Stripe : appelle route payment_start (POST) #}
-                <form method="post" action="{{ path('payment_start', {orderId: order.id}) }}">
+                <form id="stripe-form" action="{{ path('payment_start', {orderId: order.id}) }}" method="post">
                     <button type="submit" class="btn btn-primary full">Payer par carte (Stripe)</button>
                 </form>
 
@@ -203,4 +203,20 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('stripe-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const response = await fetch(e.target.action, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    const data = await response.json();
+    if (data.url) {
+        window.location.href = data.url; 
+    } else {
+        alert("Erreur : URL de paiement non reçue.");
+    }
+});
+</script>
 {% endblock %}
