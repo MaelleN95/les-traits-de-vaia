@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Service\CartService;
 use App\Repository\ProductRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -35,12 +36,14 @@ class CartController extends AbstractController
      * Ajoute un produit au panier
      */
     #[Route('/add/{id}', name: 'add')]
-    public function add(int $id): Response
+    public function add(int $id, Request $request): Response
     {
         $this->cartService->add($id);
 
         $this->addFlash('success', 'Produit ajouté au panier.');
-        return $this->redirectToRoute('cart_index');
+
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer ?? $this->generateUrl('shop_index'));
     }
 
     /**
