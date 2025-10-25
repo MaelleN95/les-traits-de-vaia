@@ -58,7 +58,7 @@ class CheckoutController extends AbstractController
             $em->persist($order);
             $em->flush();
 
-            return $this->redirectToRoute('payment_simulate', ['orderId' => $order->getId()]);
+            return $this->redirectToRoute('payment_order_details', ['orderId' => $order->getId()]);
         }
 
         return $this->render('checkout/form.html.twig', [
@@ -66,13 +66,13 @@ class CheckoutController extends AbstractController
         ]);
     }
 
-    #[Route('/payment/simulate/{orderId}', name:'payment_simulate')]
-    public function simulatePayment(int $orderId, EntityManagerInterface $em)
+    #[Route('/payment/order-details/{orderId}', name:'payment_order_details')]
+    public function orderDetailsPayment(int $orderId, EntityManagerInterface $em)
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         if(!$order) throw $this->createNotFoundException('Order not found');
 
-        return $this->render('payment/simulate.html.twig', [
+        return $this->render('payment/order-details.html.twig', [
             'order' => $order
         ]);
     }
@@ -115,7 +115,7 @@ class CheckoutController extends AbstractController
         return $this->json(['url' => $session->url]);
     }
 
-    #[Route('/payment/complete/{orderId}', name:'payment_complete', methods:['POST'])]
+    #[Route('/payment/complete/{orderId}', name:'payment_complete')]
     public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService)
     {
         $order = $em->getRepository(Order::class)->find($orderId);

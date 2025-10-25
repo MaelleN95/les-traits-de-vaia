@@ -5,7 +5,9 @@
 
 {% block stylesheets %}
   {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('styles/forms.css') }}">  
  
+
 <style>
 /* assets/styles/payment.css */
 
@@ -95,7 +97,7 @@
 
 .order-total strong {
   font-size: 1.15rem;
-  color: #0d6efd;
+  color: rgba(160, 112, 48, 1);
 }
 
 /* buttons */
@@ -119,34 +121,33 @@
 }
 
 .btn-primary {
-  background: #0d6efd;
+  background: rgba(160, 112, 48, 1);
 }
 
 .btn-primary:hover { background: #0b5ed7; transform: translateY(-2px); }
 
-.btn-success { background: #198754; }
-.btn-success:hover { background: #157347; transform: translateY(-2px); }
-
-.btn-danger { background: #dc3545; }
-.btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
-
 .btn-outline {
   display: inline-block;
+  text-align: center;
+  margin: auto;
   background: transparent;
-  color: #0d6efd;
-  border: 1px solid #0d6efd;
+  color: rgba(160, 112, 48, 1);
+  border: 1px solid rgba(160, 112, 48, 1);
   padding: 0.55rem 0.85rem;
   border-radius: 8px;
 }
 
 .btn-outline:hover {
-  background: #0d6efd;
+  background: rgba(160, 112, 48, 1);
   color: #fff;
 }
 
 /* spacing helpers */
 .mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 1rem; }
+.mt-3 { 
+  margin-top: 1rem;
+  width: calc(100% - 2rem);
+}
 
 /* responsive */
 @media (max-width: 900px) {
@@ -184,18 +185,8 @@
             <div class="col-right">
                 <h2>Méthode de paiement</h2>
 
-                {# Stripe : appelle route payment_start (POST) #}
                 <form id="stripe-form" action="{{ path('payment_start', {orderId: order.id}) }}" method="post">
-                    <button type="submit" class="btn btn-primary full">Payer par carte (Stripe)</button>
-                </form>
-
-                {# Simulation : appelle route payment_complete (POST) ou payment_simulate #}
-                <form method="post" action="{{ path('payment_complete', {orderId: order.id}) }}" class="mt-2">
-                    <button type="submit" class="btn btn-success full">Payer (simulé — succès)</button>
-                </form>
-
-                <form method="post" action="{{ path('payment_failed', {orderId: order.id}) }}" class="mt-2">
-                    <button type="submit" class="btn btn-danger full">Simuler échec</button>
+                    <button type="submit" class="btn btn-primary full">Payer par carte bancaire</button>
                 </form>
 
                 <a href="{{ path('cart_index') }}" class="btn btn-outline mt-3">Retour au panier</a>
