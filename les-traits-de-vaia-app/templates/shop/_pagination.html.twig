@@ -1,10 +1,10 @@
 {% set pages = ((total - 1) // limit) + 1 %}
 <nav class="pagination">
     {% if page > 1 %}
-        <a href="{{ path(path, {'page': page - 1}) }}">&laquo; Précédent</a>
+        <a href="{{ path(path, {'page': page - 1, 'slug': slug|default(null)}) }}">&laquo; Précédent</a>
     {% endif %}
     <span>Page {{ page }} / {{ pages }}</span>
     {% if page < pages %}
-        <a href="{{ path(path, {'page': page + 1}) }}">Suivant &raquo;</a>
+        <a href="{{ path(path, {'page': page + 1, 'slug': slug|default(null)}) }}">Suivant &raquo;</a>
     {% endif %}
 </nav>

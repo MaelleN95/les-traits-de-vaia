@@ -18,5 +18,5 @@
     {% endfor %}
 </div>
 
-{% include 'shop/_pagination.html.twig' with { page: page, limit: limit, total: total, path: path('shop_index') } %}
+{% include 'shop/_pagination.html.twig' with { page: page, limit: limit, total: total, path:'shop_index' } %}
 {% endblock %}
