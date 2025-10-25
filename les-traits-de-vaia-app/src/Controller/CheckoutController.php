@@ -12,39 +12,61 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CheckoutController extends AbstractController
 {
     #[Route('/checkout', name: 'checkout')]
-    public function checkout(Request $request, CartService $cartService, EntityManagerInterface $em)
+    public function checkout(Request $request, CartService $cartService, EntityManagerInterface $em, SessionInterface $session)
     {
         $form = $this->createForm(CheckoutType::class);
+
+        $savedData = $session->get('checkout_data', []);
+        if (!empty($savedData)) {
+            $form->get('fullname')->setData($savedData['fullname'] ?? null);
+            $form->get('address')->setData($savedData['address'] ?? null);
+            $form->get('city')->setData($savedData['city'] ?? null);
+            $form->get('postcode')->setData($savedData['postcode'] ?? null);
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+
+            $session->set('checkout_data', [
+                'fullname' => $data['fullname'],
+                'address'  => $data['address'],
+                'city'     => $data['city'],
+                'postcode'  => $data['postcode'],
+            ]);
+
             $items = $cartService->getDetailedItems();
+
             if (empty($items)) {
-                dd('Panier vide', $cartService->getCart());
+                $this->addFlash('error', 'Votre panier est vide.');
+                return $this->redirectToRoute('cart_index');
             }
 
             if(empty($items)) {
-                throw $this->createNotFoundException('Panier vide');
+                $this->addFlash('error', 'Votre panier est vide.');
+                return $this->redirectToRoute('cart_index');
             }
 
             $order = new Order();
+            
             $order->setUser($this->getUser());
             if (!$this->getUser()) {
-                dd('Utilisateur non connecté');
+                $this->addFlash('error', 'Vous devez être connecté pour passer une commande.');
+                return $this->redirectToRoute('app_login');
             }
+
             $order->setCreatedAt(new \DateTimeImmutable());
             $order->setStatus('pending');
             $order->setTotal($cartService->getTotal());
             $order->setAddress($data['address']);
-
-
 
             foreach($items as $it){
                 $oi = new OrderItem();
@@ -116,7 +138,7 @@ class CheckoutController extends AbstractController
     }
 
     #[Route('/payment/complete/{orderId}', name:'payment_complete')]
-    public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService)
+    public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService, SessionInterface $session)
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         if(!$order) throw $this->createNotFoundException('Order not found');
@@ -125,10 +147,11 @@ class CheckoutController extends AbstractController
         $order->setPaidAt(new \DateTimeImmutable());
         $em->flush();
 
-        // Vider le panier
         $cartService->clear();
 
-        // ici tu pourrais dispatcher un message Messenger pour envoyer un email
+        $session->remove('checkout_data');
+
+        // ici : message Messenger pour envoyer un email ?
 
         $this->addFlash('success', 'Paiement effectué avec succès !');
 
