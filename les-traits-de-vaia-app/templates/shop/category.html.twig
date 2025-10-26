@@ -16,21 +16,7 @@
     {% else %}
         <div class="product-grid">
             {% for product in products %}
-                <article class="product-card">
-                    <a href="{{ path('shop_product', {slug: product.slug}) }}" class="product-title">
-                        {% if product.image %}
-                            <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
-                        {% endif %}
-                        <h3>{{ product.name }}</h3>
-                    </a>
-
-                    <p class="price">{{ (product.price / 100) | number_format(2, ',', ' ') }} €</p>
-
-                    <p>
-                        <a class="btn" href="{{ path('cart_add', {id: product.id}) }}">Ajouter au panier</a>
-                        <a class="btn-link" href="{{ path('shop_product', {slug: product.slug}) }}">Voir</a>
-                    </p>
-                </article>
+              {% include 'shop/_product_card.html.twig' with {product: product} %}
             {% endfor %}
         </div>
 
