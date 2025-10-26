@@ -56,7 +56,6 @@ class RegistrationController extends AbstractController
         }
 
         try {
-            // Ici handleEmailConfirmation attend bien le Request ET l’User
             $emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('error', $exception->getReason());

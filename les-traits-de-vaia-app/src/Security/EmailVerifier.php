@@ -25,25 +25,25 @@ class EmailVerifier
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $routeName,
             $user->getId(),
-            $user->getEmail()
+            $user->getEmail(),
+            ['id' => $user->getId()],
+            86400
         );
 
+        $signedUrl = $signatureComponents->getSignedUrl();
+
         $email = (new TemplatedEmail())
-            ->from(new Address('nioche.maelle@gmail.com', 'Nom de ton site'))
+            ->from(new Address('nioche.maelle@gmail.com', 'Les traits de Vaia'))
             ->to($user->getEmail())
             ->subject('Veuillez confirmer votre adresse email')
             ->htmlTemplate('emails/confirmation_email.html.twig')
             ->context([
-                'signedUrl' => $this->verifyEmailHelper->generateSignature(
-                    'app_verify_email',
-                    $user->getId(), // <-- ici tu passes l'ID
-                    $user->getEmail(),
-                    ['id' => $user->getId()]
-                )->getSignedUrl(),
-                'expiresAtMessageKey' => '...',
-                'expiresAtMessageData' => ['%count%' => 3600],
+                'signedUrl' => $signedUrl,
+                'expiresAtMessageKey' => $signatureComponents->getExpirationMessageKey(),
+                'expiresAtMessageData' => $signatureComponents->getExpirationMessageData(),
                 'user' => $user,
             ]);
+
 
         $this->mailer->send($email);
     }
