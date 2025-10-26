@@ -208,6 +208,25 @@ form div {
     margin-bottom: 1rem;
 }
 
+.btn-checkout-secondary {
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: #fff;
+    border: 1px solid rgba(98, 68, 28, 1);
+    color: rgba(160, 112, 48, 1);
+}
+
+.btn-checkout-secondary:hover {
+  background-color: rgba(98, 68, 28, 1);
+  color: #fff;
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {

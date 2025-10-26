@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Checkout{% endblock %}
+{% block title %}Commander - Étape 1 : adresse{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block body %}
-<h1>Commander</h1>
+<h1>Veuillez saisir votre adresse de livraison</h1>
 
 {{ form_start(form) }}
     {{ form_row(form.fullname) }}
@@ -16,4 +16,5 @@
     {{ form_row(form.city) }}
     {{ form_row(form.postcode) }}
 {{ form_end(form) }}
+<a href="{{ path('cart_index') }}" class="btn-checkout btn-checkout-secondary">← Retour au panier</a>
 {% endblock %}
