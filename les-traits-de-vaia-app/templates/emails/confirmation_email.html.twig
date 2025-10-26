@@ -1,0 +1,8 @@
+{# templates/emails/confirmation_email.html.twig #}
+<h3>Bonjour {{ user.fullname }},</h3>
+
+<p>Merci de votre inscription. Cliquez sur le lien ci-dessous pour confirmer votre adresse email :</p>
+
+<p><a href="{{ signedUrl }}">Confirmer mon email</a></p>
+
+<p>Ce lien expirera dans 24h.</p>
