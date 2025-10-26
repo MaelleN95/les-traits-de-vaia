@@ -10,6 +10,7 @@ h1 {
 }
 
 .product-card {
+  position: relative;
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
@@ -29,9 +30,14 @@ h1 {
   object-fit: cover;
 }
 
-.product-card .product-title {
+.product-card .product-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
   text-decoration: none;
   color: #333;
+
 }
 
 .product-card h3 {
@@ -102,4 +108,11 @@ h1 {
 
 .spacer-large a {
   color: rgba(98, 68, 28, 1);
+}
+
+/* Empêcher les vrais boutons et lien d'être bloqués par le lien global */
+.product-card .btn,
+.product-card .btn-link {
+    position: relative;
+    z-index: 2;
 }
