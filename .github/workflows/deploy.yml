@@ -97,6 +97,7 @@ jobs:
                 echo "APP_DEBUG=0"
                 echo "DEFAULT_URI="https://${{ env.PROJECT_DOMAIN }}""
                 echo "MESSENGER_TRANSPORT_DSN=sync://"
+                echo "APP_SECRET=${{ secrets.APP_SECRET }}"
             } > .env
 
       - name: Upload .env to server
