@@ -81,17 +81,17 @@ jobs:
 
       - name: Inject environment variables on server
         run: |
-          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
-            echo 'Injection des variables d environnement dans .env'
-            echo 'DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"' > /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'MAILER_DSN=\"${{ secrets.MAILER_DSN }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'MAILER_DSN=\"${{ secrets.STRIPE_SECRET_KEY }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'MAILER_DSN=\"${{ secrets.STRIPE_PUBLIC_KEY }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'MAILER_DSN=\"${{ secrets.MAILER_FROM }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            printf 'DATABASE_URL=%q\n' '${{ secrets.DATABASE_URL }}' > /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            printf 'MAILER_DSN=%q\n' '${{ secrets.MAILER_DSN }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            printf 'STRIPE_SECRET_KEY=%q\n' '${{ secrets.STRIPE_SECRET_KEY }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            printf 'STRIPE_PUBLIC_KEY=%q\n' '${{ secrets.STRIPE_PUBLIC_KEY }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            printf 'MAILER_FROM=%q\n' '${{ secrets.MAILER_FROM }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             echo 'APP_ENV=prod' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             echo 'APP_DEBUG=0' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             echo 'Variables injectees dans .env'
-          "
+            "
+
 
       - name: Test the DB connection using the Github Actions variable DATABASE_URL
         run: |
