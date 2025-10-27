@@ -1,0 +1,195 @@
+name: Automatic deployment to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PROJECT_NAME: "les-traits-de-vaia-app"
+  PROJECT_DOMAIN: "aliceblue-alligator-953295.hostingersite.com"
+  PHP_VERSION: "8.2"
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+            php-version: ${{ env.PHP_VERSION }}
+            extensions: mbstring, intl, pdo, pdo_mysql, ctype, iconv, xml, zip
+            tools: composer:v2.8.6
+      
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+
+      - name: Add Hostinger to known hosts
+        run: |
+          ssh-keyscan -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Verify Composer and PHP versions
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            php -v &&
+            \$HOME/bin/composer -V
+          "
+
+      - name: Deploy entire ${{ env.PROJECT_NAME }} directory
+        run: |
+          REMOTE_DIR="/home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/"
+
+          echo "Création du répertoire distant : $REMOTE_DIR"
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} \
+            ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} \
+            "mkdir -p $REMOTE_DIR"
+
+          echo "Déploiement complet du projet Symfony vers $REMOTE_DIR"
+          rsync -avz --delete --exclude 'public/uploads/' -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT }}" \
+            ${{ env.PROJECT_NAME }}/ \
+            ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }}:$REMOTE_DIR
+
+      - name: Create public_html symlink on server
+        run: |
+          echo "Création du lien symbolique entre le dossier ${{ env.PROJECT_NAME }}/public et /public_html"
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            rm -rf /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/public_html &&
+            ln -s /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/public /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/public_html
+          "
+  
+      - name: Install Composer dependencies on server
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} || exit 1
+            source ~/.bashrc
+            rm -rf vendor/
+            composer install --no-dev --optimize-autoloader --no-scripts
+            rm -rf var/cache/prod
+          EOF
+
+      - name: Inject environment variables on server
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            echo 'Injection des variables d environnement dans .env'
+            echo 'DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"' > /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'MAILER_DSN=\"${{ secrets.MAILER_DSN }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'MAILER_DSN=\"${{ secrets.STRIPE_SECRET_KEY }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'MAILER_DSN=\"${{ secrets.STRIPE_PUBLIC_KEY }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'MAILER_DSN=\"${{ secrets.MAILER_FROM }}\"' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'APP_ENV=prod' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'APP_DEBUG=0' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
+            echo 'Variables injectees dans .env'
+          "
+
+      - name: Test the DB connection using the Github Actions variable DATABASE_URL
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            DATABASE_URL='${{ secrets.DATABASE_URL }}' php -r '
+              \$url = getenv(\"DATABASE_URL\");
+              if (!\$url) {
+                echo \"DATABASE_URL not set\\n\";
+                exit(1);
+              }
+              try {
+                \$params = parse_url(\$url);
+                if (!\$params) throw new Exception(\"Invalid DATABASE_URL\");
+                \$pdo = new PDO(\"mysql:host=\".\$params[\"host\"].\";port=\".\$params[\"port\"].\";dbname=\".ltrim(\$params[\"path\"], \"/\"), \$params[\"user\"], \$params[\"pass\"] );
+                echo \"DB connection successful\\n\";
+                exit(0);
+              } catch (Exception \$e) {
+                echo \"DB connection failed: \".\$e->getMessage().\"\\n\";
+                exit(1);
+              }
+            '
+          "
+
+      - name: Install importmap assets on server
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} &&
+            php bin/console importmap:install --no-interaction
+          "
+
+      - name: Compile assets with Asset Map
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} &&
+            php bin/console asset-map:compile --env=prod
+          " 
+
+      - name: Create or update .htaccess in public directory
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
+            HTACCESS_FILE="/home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/public/.htaccess"
+            BLOCK='<IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^ index.php [QSA,L]
+            </IfModule>'
+
+            if [ -f "$HTACCESS_FILE" ]; then
+              if ! grep -q 'RewriteEngine On' "$HTACCESS_FILE"; then
+                (echo "$BLOCK"; cat "$HTACCESS_FILE") > "$HTACCESS_FILE.tmp" && mv "$HTACCESS_FILE.tmp" "$HTACCESS_FILE"
+              fi
+            else
+              echo "$BLOCK" > "$HTACCESS_FILE"
+            fi
+          EOF
+
+      - name: Run database create on Hostinger
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
+            echo "--- AJOUT PATH ---"
+            source ~/.bashrc
+            echo "📍 Début SSH script"
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} || { echo "❌ Dossier non trouvé" && exit 1; }
+            php -d display_errors=1 bin/console cache:clear -vv || echo "❌ Cache clear KO"
+            echo "--- Création DB ---"
+            php -d display_errors=1 bin/console doctrine:database:create --env=prod --if-not-exists -vvv || echo "❌ DB create KO"
+            echo "✅ Fin SSH script"
+          EOF
+          
+      - name: Run migrations and Symfony commands
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} &&
+            
+            echo "Vérification des fichiers de migration..."
+            if ls migrations/*.php 1> /dev/null 2>&1; then
+              echo "✅ Migrations détectées."
+
+              echo "Exécution des migrations..."
+              if php bin/console doctrine:migrations:migrate --no-interaction --env=prod; then
+                echo "✅ Migrations appliquées avec succès."
+              else
+                echo "❌ Erreur lors de l’exécution des migrations."
+                echo "Liste des fichiers de migration :"
+                ls -l migrations/
+                echo "ℹ️ Vérifie les fichiers listés pour détecter la cause de l’erreur."
+                exit 1
+              fi
+            else
+              echo "ℹ️ Aucune migration trouvée, étape ignorée."
+            fi
+            php bin/console cache:clear --no-warmup --env=prod &&
+            php bin/console cache:warmup --env=prod
+          "
+
+      - name: Set permissions
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} \
+            ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
+              chmod -R 755 /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/public_html/ &&
+              chmod -R 777 /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/var/"
