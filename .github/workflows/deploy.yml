@@ -90,7 +90,7 @@ jobs:
                 echo "MAILER_FROM=${{ secrets.MAILER_FROM }}"
                 echo "APP_ENV=prod"
                 echo "APP_DEBUG=0"
-                echo "DEFAULT_URI="https://${{ env.PROJECT_DOMAIN }}"
+                echo "DEFAULT_URI="https://${{ env.PROJECT_DOMAIN }}""
             } > .env
 
       - name: Upload .env to server
