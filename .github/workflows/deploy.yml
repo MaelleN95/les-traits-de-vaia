@@ -90,7 +90,7 @@ jobs:
             echo 'APP_ENV=prod' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             echo 'APP_DEBUG=0' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             echo 'Variables injectees dans .env'
-            cat .env
+            cat /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
             "
 
 
