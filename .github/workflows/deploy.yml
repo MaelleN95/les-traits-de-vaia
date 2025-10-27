@@ -94,31 +94,34 @@ jobs:
 
 
 
-      - name: Test the DB connection using the .env on server
+      - name: Test DB connection on server
         run: |
             ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} << EOF
-            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}
+            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} || exit 1
+            # Charger DATABASE_URL depuis le .env
             export $(grep DATABASE_URL .env | xargs)
-            php -r '
-                $url = getenv("DATABASE_URL");
-                if (!$url) {
-                echo "DATABASE_URL not set\n";
+
+            php -r "
+            \$url = getenv('DATABASE_URL');
+            if (!\$url) {
+                echo 'DATABASE_URL not set\n';
                 exit(1);
-                }
-                try {
-                $params = parse_url($url);
-                $pdo = new PDO(
-                    "mysql:host={$params["host"]};port={$params["port"]};dbname=".ltrim($params["path"], "/"),
-                    $params["user"],
-                    $params["pass"]
+            }
+            try {
+                \$params = parse_url(\$url);
+                \$pdo = new PDO(
+                    'mysql:host='.\$params['host'].';port='.\$params['port'].';dbname='.ltrim(\$params['path'], '/'),
+                    \$params['user'],
+                    \$params['pass']
                 );
-                echo "DB connection successful\n";
-                } catch (Exception $e) {
-                echo "DB connection failed: ".$e->getMessage()."\n";
+                echo 'DB connection successful\n';
+            } catch (Exception \$e) {
+                echo 'DB connection failed: '.\$e->getMessage().\"\n\";
                 exit(1);
-                }
-            '
-        EOF
+            }
+            "
+            EOF
+
 
 
 
