@@ -96,7 +96,7 @@ jobs:
       - name: Test the DB connection using the Github Actions variable DATABASE_URL
         run: |
           ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
-            DATABASE_URL="${{ env.DATABASE_URL }}" php -r "
+            DATABASE_URL='${{ env.DATABASE_URL }}' php -r '
               \$url = getenv(\"DATABASE_URL\");
               if (!\$url) {
                 echo \"DATABASE_URL not set\\n\";
@@ -112,7 +112,7 @@ jobs:
                 echo \"DB connection failed: \".\$e->getMessage().\"\\n\";
                 exit(1);
               }
-            "
+            '
           "
 
       - name: Install importmap assets on server
