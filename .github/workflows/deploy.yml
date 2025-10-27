@@ -109,7 +109,8 @@ jobs:
                 echo \"DB connection successful\\n\";
                 exit(0);
               } catch (Exception \$e) {
-                echo \"DB connection failed: \".\$e->getMessage().\"\\n\";
+                echo \"DB connection failed: \".\$e->getMessage().\"\\n\"
+                echo $url;
                 exit(1);
               }
             '
@@ -156,6 +157,7 @@ jobs:
             echo "📍 Début SSH script"
             cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} || { echo "❌ Dossier non trouvé" && exit 1; }
             php -d display_errors=1 bin/console cache:clear -vv || echo "❌ Cache clear KO"
+            cat .env
             echo "--- Création DB ---"
             php -d display_errors=1 bin/console doctrine:database:create --env=prod --if-not-exists -vvv || echo "❌ DB create KO"
             echo "✅ Fin SSH script"
