@@ -79,19 +79,22 @@ jobs:
             rm -rf var/cache/prod
           EOF
 
-      - name: Inject environment variables on server
+      - name: Create .env locally
         run: |
-            ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }} "
-            printf 'DATABASE_URL=%q\n' '${{ env.DATABASE_URL }}' > /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            printf 'MAILER_DSN=%q\n' '${{ secrets.MAILER_DSN }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            printf 'STRIPE_SECRET_KEY=%q\n' '${{ secrets.STRIPE_SECRET_KEY }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            printf 'STRIPE_PUBLIC_KEY=%q\n' '${{ secrets.STRIPE_PUBLIC_KEY }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            printf 'MAILER_FROM=%q\n' '${{ secrets.MAILER_FROM }}' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'APP_ENV=prod' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'APP_DEBUG=0' >> /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            echo 'Variables injectees dans .env'
-            cat /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
-            "
+            {
+                echo "DATABASE_URL=${{ env.DATABASE_URL }}"
+                echo "MAILER_DSN=${{ secrets.MAILER_DSN }}"
+                echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}"
+                echo "STRIPE_PUBLIC_KEY=${{ secrets.STRIPE_PUBLIC_KEY }}"
+                echo "MAILER_FROM=${{ secrets.MAILER_FROM }}"
+                echo "APP_ENV=prod"
+                echo "APP_DEBUG=0"
+            } > .env
+
+      - name: Upload .env to server
+        run: |
+            scp -P ${{ secrets.HOSTINGER_SSH_PORT }} .env \
+            ${{ secrets.HOSTINGER_USERNAME }}@${{ secrets.HOSTINGER_HOST }}:/home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }}/.env
 
 
       - name: Test the DB connection using the Github Actions variable DATABASE_URL
@@ -158,7 +161,6 @@ jobs:
             echo "📍 Début SSH script"
             cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/${{ env.PROJECT_DOMAIN }}/${{ env.PROJECT_NAME }} || { echo "❌ Dossier non trouvé" && exit 1; }
             php -d display_errors=1 bin/console cache:clear -vv || echo "❌ Cache clear KO"
-            cat .env
             echo "--- Création DB ---"
             php -d display_errors=1 bin/console doctrine:database:create --env=prod --if-not-exists -vvv || echo "❌ DB create KO"
             echo "✅ Fin SSH script"
