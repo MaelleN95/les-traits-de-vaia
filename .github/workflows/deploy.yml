@@ -23,6 +23,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Restore Symfony private key
+        run: |
+          mkdir -p config/secrets/prod
+          echo "${{ secrets.SYMFONY_PRIVATE_KEY }}" > config/secrets/prod/prod.decrypt.private.php
+
       - name: Set up PHP & Composer
         uses: shivammathur/setup-php@v2
         with:
