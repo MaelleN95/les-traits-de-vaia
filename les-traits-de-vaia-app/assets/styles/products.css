@@ -116,3 +116,9 @@ h1 {
     position: relative;
     z-index: 2;
 }
+
+.categorie-description {
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}

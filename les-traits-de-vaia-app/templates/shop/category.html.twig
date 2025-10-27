@@ -10,6 +10,7 @@
 
 {% block body %}
     <h1>{{ category.name }}</h1>
+    <p class="categorie-description">{{ category.description }}</p>
 
     {% if products is empty %}
         <p>Aucun produit dans cette catégorie.</p>

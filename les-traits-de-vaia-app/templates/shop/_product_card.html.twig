@@ -1,6 +1,6 @@
 <article class="product-card">
     <a href="{{ path('shop_product', {slug: product.slug}) }}" class="product-link"></a>
-        <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+        <img src="{{ asset('images/' ~ product.image) }}" alt="{{ product.name }}" loading="lazy">
         <h3>{{ product.name }}</h3>
     <p class="price">{{ (product.price / 100) | number_format(2, ',', ' ') }} €</p>
     <p>
