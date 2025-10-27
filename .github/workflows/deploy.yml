@@ -13,6 +13,7 @@ env:
   PROJECT_DOMAIN: "aliceblue-alligator-953295.hostingersite.com"
   PHP_VERSION: "8.2"
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  DEFAULT_URI: "https://aliceblue-alligator-953295.hostingersite.com"
 
 jobs:
   deploy:
@@ -89,6 +90,7 @@ jobs:
                 echo "MAILER_FROM=${{ secrets.MAILER_FROM }}"
                 echo "APP_ENV=prod"
                 echo "APP_DEBUG=0"
+                echo "DEFAULT_URI="https://${{ env.PROJECT_DOMAIN }}"
             } > .env
 
       - name: Upload .env to server
