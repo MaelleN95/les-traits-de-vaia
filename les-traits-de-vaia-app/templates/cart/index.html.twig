@@ -33,7 +33,7 @@
                        <td data-label="Produit">
                             <div class="d-flex align-items-center">
                                 {% if item.product.image %}
-                                     <img src="{{ item.product.image }}" alt="{{ item.product.name }}" loading="lazy">
+                                     <img src="{{ asset('images/' ~ item.product.image) }}" alt="{{ item.product.name }}" loading="lazy">
                                 {% endif %}
                                 <a href="{{ path('shop_product', { slug: item.product.slug }) }}">{{ item.product.name }}</a>
                             </div>
