@@ -91,7 +91,7 @@ jobs:
                 echo "APP_ENV=prod"
                 echo "APP_DEBUG=0"
                 echo "DEFAULT_URI="https://${{ env.PROJECT_DOMAIN }}""
-                MESSENGER_TRANSPORT_DSN=doctrine://default
+                MESSENGER_TRANSPORT_DSN=sync://
             } > .env
 
       - name: Upload .env to server
