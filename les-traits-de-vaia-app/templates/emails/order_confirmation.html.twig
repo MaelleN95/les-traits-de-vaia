@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #444;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background: #f2f2f2;
+            text-align: left;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+            padding-top: 10px;
+        }
+        .warning-msg-mail {
+            background-color: #ffdddd;
+            border-left: 6px solid #f44336;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Merci pour votre commande fictive, {{ user.fullname }} !</h1>
+    <p>Je vous confirme la réception de votre paiement pour la commande fictive <strong>n°{{ order.id }}</strong>.</p>
+
+    <h3>Détails de votre commande fictive :</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Article</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+                    <td>{{ ((item.unitPrice * item.quantity) / 100)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="total">Montant total : {{ (order.total / 100)|number_format(2, ',', ' ') }} €</p>
+
+    <p class="warning-msg-mail">Je vous rappelle que cette boutique est fictive et que l'achat que vous venez de réaliser est réel mais que les produits ne le sont pas. Par conséquent, vous venez d'effectuer un don.</p>
+
+    <p>Tout de même, si vous n'aviez pas vu mes précédents avertissements et que vous ne faisiez qu'un test, il est possible d'effectuer un remboursement en me contactant à l'adresse suivante : <a href="mailto:contact@koji-dev.fr">.</a> Je vous rembourserai le plus rapidement possible !</p>
+
+    <p>Merci pour votre confiance,
+    <br><strong>Mme NIOCHE Maëlle</strong></p>
+
+    <div class="footer">
+        © {{ "now"|date("Y") }} Les Traits de Vaia — Cet e-mail est généré automatiquement, merci de ne pas y répondre.
+    </div>
+</div>
+</body>
+</html>

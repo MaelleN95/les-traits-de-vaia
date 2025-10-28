@@ -7,8 +7,11 @@ use App\Entity\OrderItem;
 use App\Form\CheckoutType;
 use App\Service\CartService;
 use Stripe\Checkout\Session;
+use Symfony\Component\Mime\Address;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -138,7 +141,7 @@ class CheckoutController extends AbstractController
     }
 
     #[Route('/payment/complete/{orderId}', name:'payment_complete')]
-    public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService, SessionInterface $session)
+    public function completePayment(int $orderId, EntityManagerInterface $em, CartService $cartService, SessionInterface $session, MailerInterface $mailer)
     {
         $order = $em->getRepository(Order::class)->find($orderId);
         if(!$order) throw $this->createNotFoundException('Order not found');
@@ -151,9 +154,24 @@ class CheckoutController extends AbstractController
 
         $session->remove('checkout_data');
 
-        // ici : message Messenger pour envoyer un email ?
+        $email = (new TemplatedEmail())
+            ->from(new Address($_ENV['MAILER_FROM'], 'Les traits de Vaia'))
+            ->to($order->getUser()->getEmail())
+            ->subject('Confirmation de votre commande fictive n°' . $order->getId())
+            ->htmlTemplate('emails/order_confirmation.html.twig')
+            ->context([
+                'order' => $order,
+                'user' => $order->getUser(),
+            ]); 
 
-        $this->addFlash('success', 'Paiement effectué avec succès !');
+        try {
+            $mailer->send($email);
+        } catch (\Throwable $e) {
+            $this->addFlash('warning', 'Le paiement est validé, mais l’e-mail de confirmation n’a pas pu être envoyé.');
+        }
+
+        $this->addFlash('success', 'Paiement effectué avec succès ! Un e-mail de confirmation vous a été envoyé.');
+
 
         return $this->redirectToRoute('shop_index');
     }
