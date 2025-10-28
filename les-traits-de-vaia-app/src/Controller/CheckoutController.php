@@ -99,7 +99,7 @@ class CheckoutController extends AbstractController
         ]);
     }
 
-    #[Route('/payment/{orderId}', name: 'payment_start', methods: ['POST'])]
+    #[Route('/payment/{orderId}', name: 'payment_start', methods: ['POST', 'GET'])]
     public function start(int $orderId, EntityManagerInterface $em): JsonResponse
     {
         $order = $em->getRepository(Order::class)->find($orderId);
