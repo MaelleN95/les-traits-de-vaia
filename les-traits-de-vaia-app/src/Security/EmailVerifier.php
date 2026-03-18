@@ -33,7 +33,7 @@ class EmailVerifier
         $signedUrl = $signatureComponents->getSignedUrl();
 
         $email = (new TemplatedEmail())
-            ->from(new Address('nioche.maelle@gmail.com', 'Les traits de Vaia'))
+            ->from(new Address('contact@koji-dev.fr', 'Les traits de Vaia'))
             ->to($user->getEmail())
             ->subject('Veuillez confirmer votre adresse email')
             ->htmlTemplate('emails/confirmation_email.html.twig')

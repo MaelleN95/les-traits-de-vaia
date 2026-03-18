@@ -13,7 +13,7 @@ class TestMailController extends AbstractController
     public function index(MailerInterface $mailer): Response
     {
         $email = (new Email())
-            ->from('nioche.maelle@gmail.com')
+            ->from('contact@koji-dev.fr')
             ->to('maelle.nioche@gmail.com')
             ->subject('Test Symfony + Brevo')
             ->text('Mail de test envoyé via Brevo SMTP !');
